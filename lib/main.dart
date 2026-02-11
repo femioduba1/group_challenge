@@ -25,6 +25,7 @@ class ValentineHome extends StatefulWidget {
 class _ValentineHomeState extends State<ValentineHome> {
   final List<String> emojiOptions = ['Sweet Heart', 'Party Heart'];
   String selectedEmoji = 'Sweet Heart';
+  double heartScale = 1.0; // added for pulse effect
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +34,7 @@ class _ValentineHomeState extends State<ValentineHome> {
       body: Column(
         children: [
           const SizedBox(height: 16),
+          // ---The Emoji DropDown
           DropdownButton<String>(
             value: selectedEmoji,
             items: emojiOptions
@@ -55,11 +57,23 @@ class _ValentineHomeState extends State<ValentineHome> {
             ),
           ),
           const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                heartScale = heartScale == 1.0 ? 1.2 : 1.0;
+              });
+            },
+            child: const Text('Pulse Heart'),
+          ),
+          const SizedBox(height: 16),
           Expanded(
             child: Center(
-              child: CustomPaint(
-                size: const Size(300, 300),
-                painter: HeartEmojiPainter(type: selectedEmoji),
+              child: Transform.scale(
+                scale: heartScale, // scale for pulse effect
+                child: CustomPaint(
+                  size: const Size(300, 300),
+                  painter: HeartEmojiPainter(type: selectedEmoji),
+                ),
               ),
             ),
           ),
@@ -130,6 +144,16 @@ class HeartEmojiPainter extends CustomPainter {
         ..lineTo(center.dx + 40, center.dy - 40)
         ..close();
       canvas.drawPath(hatPath, hatPaint);
+
+      // Party confetti
+      final confettiPaint = Paint()..color = Colors.orange;
+      for (int i = 0; i < 10; i++) {
+        canvas.drawCircle(
+          Offset(center.dx + (i * 5 - 25), center.dy - 50 + (i * 3)),
+          3,
+          confettiPaint,
+        );
+      }
     }
   }
 
