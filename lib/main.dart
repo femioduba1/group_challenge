@@ -22,10 +22,11 @@ class ValentineHome extends StatefulWidget {
   State<ValentineHome> createState() => _ValentineHomeState();
 }
 
-class _ValentineHomeState extends State<ValentineHome> {
+class _ValentineHomeState extends State<ValentineHome>
+    with SingleTickerProviderStateMixin {
   final List<String> emojiOptions = ['Sweet Heart', 'Party Heart'];
   String selectedEmoji = 'Sweet Heart';
-  double heartScale = 1.0; // added for pulse effect
+  double heartScale = 1.0;
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +70,7 @@ class _ValentineHomeState extends State<ValentineHome> {
           Expanded(
             child: Center(
               child: Transform.scale(
-                scale: heartScale, // scale for pulse effect
+                scale: heartScale,
                 child: CustomPaint(
                   size: const Size(300, 300),
                   painter: HeartEmojiPainter(type: selectedEmoji),
@@ -119,24 +120,40 @@ class HeartEmojiPainter extends CustomPainter {
     canvas.drawPath(heartPath, paint);
 
     // Face features
-    final eyePaint = Paint()..color = Colors.white;
-    canvas.drawCircle(Offset(center.dx - 30, center.dy - 10), 10, eyePaint);
-    canvas.drawCircle(Offset(center.dx + 30, center.dy - 10), 10, eyePaint);
+    if (type == 'Sweet Heart') {
+      final eyePaint = Paint()..color = Colors.white;
+      canvas.drawCircle(Offset(center.dx - 30, center.dy - 10), 10, eyePaint);
+      canvas.drawCircle(Offset(center.dx + 30, center.dy - 10), 10, eyePaint);
 
-    final mouthPaint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 4;
-    canvas.drawArc(
-      Rect.fromCircle(center: Offset(center.dx, center.dy + 20), radius: 30),
-      0,
-      3.14,
-      false,
-      mouthPaint,
-    );
+      final mouthPaint = Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4;
+      canvas.drawArc(
+        Rect.fromCircle(center: Offset(center.dx, center.dy + 20), radius: 30),
+        0,
+        3.14,
+        false,
+        mouthPaint,
+      );
+    } else if (type == 'Party Heart') {
+      final eyePaint = Paint()..color = Colors.white;
+      canvas.drawCircle(Offset(center.dx - 30, center.dy - 10), 10, eyePaint);
+      canvas.drawCircle(Offset(center.dx + 30, center.dy - 10), 10, eyePaint);
 
-    // Party hat placeholder
-    if (type == 'Party Heart') {
+      final mouthPaint = Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4;
+      canvas.drawArc(
+        Rect.fromCircle(center: Offset(center.dx, center.dy + 20), radius: 30),
+        0,
+        3.14,
+        false,
+        mouthPaint,
+      );
+
+      // Party hat placeholder
       final hatPaint = Paint()..color = const Color(0xFFFFD54F);
       final hatPath = Path()
         ..moveTo(center.dx, center.dy - 110)
@@ -145,14 +162,18 @@ class HeartEmojiPainter extends CustomPainter {
         ..close();
       canvas.drawPath(hatPath, hatPaint);
 
-      // Party confetti
-      final confettiPaint = Paint()..color = Colors.orange;
-      for (int i = 0; i < 10; i++) {
-        canvas.drawCircle(
-          Offset(center.dx + (i * 5 - 25), center.dy - 50 + (i * 3)),
-          3,
-          confettiPaint,
-        );
+      // Confetti
+      final confettiPaint = Paint()
+        ..color = Colors
+            .primaries[DateTime.now().millisecond % Colors.primaries.length]
+        ..strokeWidth = 3
+        ..style = PaintingStyle.stroke;
+
+      for (int i = 0; i < 20; i++) {
+        final x = center.dx + (i * 7) * (i % 2 == 0 ? 1 : -1);
+        final y = center.dy + (i * 5) * (i % 3 == 0 ? 1 : -1);
+        canvas.drawCircle(Offset(x, y), 4, confettiPaint);
+        canvas.drawLine(Offset(x, y), Offset(x + 5, y + 5), confettiPaint);
       }
     }
   }
